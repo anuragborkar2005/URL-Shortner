@@ -67,5 +67,5 @@ Contributions are what make the open-source community such an amazing place to l
 ## Contact
 Anurag Borkar - [anuragborkar2005@gmail.com](mailto:anuragborkar2005@gmail.com)
 
-Project Link: [https://github.com/anuragborkar2005/url-shortener](https://github.com/anuragborkar2005/url-shortener)
+Project Link: [https://github.com/anuragborkar2005/URL-Shortner](https://github.com/anuragborkar2005/URL-Shortner)
 
