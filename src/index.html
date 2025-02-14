@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="output.css" />
+  </head>
+  <body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="w-[350px] bg-white shadow-md rounded-md">
+      <div class="p-6">
+        <h1 class="font-bold text-xl text-center mb-4">URL Shortener</h1>
+        <form id="url-shortener-form">
+          <div class="grid gap-4">
+            <div class="flex flex-col space-y-1.5">
+              <label for="url" class="text-sm font-medium">Enter URL</label>
+              <input
+                type="url"
+                id="url"
+                name="url"
+                class="border p-2 rounded-md"
+                placeholder="Enter URL"
+              />
+            </div>
+            <div class="flex flex-col space-y-1.5">
+              <label for="customCode" class="text-sm font-medium"
+                >Enter Custom Code (Optional)</label
+              >
+              <input
+                type="text"
+                id="customCode"
+                name="customCode"
+                class="border p-2 rounded-md"
+                placeholder="Enter Custom Code"
+              />
+            </div>
+            <button
+              type="submit"
+              class="bg-slate-900 text-white py-2 px-4 rounded-md mt-4"
+            >
+              Shorten URL
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="p-6 border-t">
+        <h2 class="font-bold text-xl text-center">Shortened URL</h2>
+        <ul id="shortened-urls" class="mt-4"></ul>
+      </div>
+    </div>
+    <script>
+      // Function to fetch and display shortened URLs
+      const fetchShortenedURL = async () => {
+        const response = await fetch("/links"); // Fetching the links from the server
+        const links = await response.json(); // Parsing the JSON response
+        console.log(links);
+
+        const list = document.getElementById("shortened-urls");
+        list.innerHTML = ""; // Clear previous entries
+
+        // Loop through each short code and URL pair and create list items
+        for (const [shortCode, url] of Object.entries(links)) {
+          const li = document.createElement("li"); // Create a list item element
+          const truncatedURL = `${
+            url.length >= 30 ? `${url.slice(0, 30)}...` : url
+          }`; // Truncate long URLs for display
+          li.classList.add(
+            "text-xs",
+            "text-violet-600",
+            "underline",
+            "overflow-hidden"
+          ); // Add classes to the list item
+          li.innerHTML = `<a href="${window.location.origin}/${shortCode}" target="_blank">${window.location.origin}/${shortCode}</a> - ${truncatedURL}`; // Set the inner HTML for the list item
+          list.append(li); // Append the list item to the list
+        }
+      };
+
+      const form = document.getElementById("url-shortener-form");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Prevent the default form submission behavior
+
+        const formData = new FormData(e.target); // Get the form data
+        const url = formData.get("url");
+        const code = formData.get("customCode");
+        console.log(url, code);
+
+        try {
+          const response = await fetch("/shorten", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url, code }),
+          }); // Sending a POST request to the server with the URL and custom code
+
+          if (response.ok) {
+            fetchShortenedURL(); // Fetch and display the shortened URLs if the request is successful
+            alert("Form submitted successfully"); // Show a success message
+            e.target.reset(); // Reset the form fields
+          } else {
+            const error = await response.text();
+            alert(error); // Show an error message if the request fails
+          }
+        } catch (error) {
+          console.log(error); // Log any errors
+        }
+      });
+
+      fetchShortenedURL(); // Fetch and display the shortened URLs when the page loads
+    </script>
+  </body>
+</html>
